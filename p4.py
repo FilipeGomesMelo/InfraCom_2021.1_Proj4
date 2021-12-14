@@ -9,7 +9,7 @@ class GUI:
         self.window.title("waiting...")
 
         self.canva = Canvas(self.window, width=width, height=height)
-        self.canva.grid(columnspan=3)
+        self.canva.grid(columnspan=4)
         
         self.target_ip = target
 
@@ -23,16 +23,18 @@ class GUI:
     
     def createWidgets(self):
         self.txt_area = Text(self.canva, border=1)
-        self.txt_field = Entry(self.canva, width=85, border=1, bg='white')
+        self.txt_field = Entry(self.canva, width=65, border=1, bg='white')
         self.send_button = Button(self.canva, text='Send', padx=40, command=self.send)
+        self.update_button = Button(self.canva, text='Update', padx=40, command=self.update)
 
         self.window.bind('<Return>', self.send)
         self.window.bind('<Shift_R>', self.update)
         self.txt_area.config(background='#c8a2c8')
 
-        self.txt_area.grid(column=0, row=0, columnspan=3)
+        self.txt_area.grid(column=0, row=0, columnspan=4)
         self.txt_field.grid(column=0, row=1, columnspan=2)
         self.send_button.grid(column=2, row=1)
+        self.update_button.grid(column=3, row=1)
 
     def connect(self):
         try:
@@ -52,6 +54,8 @@ class GUI:
     
     def send(self, event=None):
         msg = self.txt_field.get()
+        if msg.replace(' ', '') == '':
+            return
         msg = msg.replace("\\n","\n")
         msg = f"\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
