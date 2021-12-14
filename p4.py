@@ -29,6 +29,7 @@ class GUI:
 
         self.window.bind('<Return>', self.send)
         self.window.bind('<Shift_R>', self.update)
+        self.txt_area.bind('<Configure>', self.reset_tabstop)
         self.txt_area.config(background='#c8a2c8')
 
         self.txt_area.grid(column=0, row=0, columnspan=4)
@@ -59,8 +60,12 @@ class GUI:
         msg = msg.replace("\\n","\n")
         msg = f"\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
+        msg = msg.replace('\n', '\n\t')
         self.txt_area.insert(END, msg)
         self.txt_field.delete(0, END)
+
+    def reset_tabstop(self, event):
+        event.widget.configure(tabs=(event.width-8, "right"))
 
     def update(self, event=None):
         try:
