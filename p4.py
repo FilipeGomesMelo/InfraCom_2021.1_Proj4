@@ -9,7 +9,7 @@ class GUI:
         self.window.title("waiting...")
 
         self.canva = Canvas(self.window, width=width, height=height)
-        self.canva.grid(columnspan=4)
+        self.canva.grid(columnspan=5)
         
         self.target_ip = target
 
@@ -23,19 +23,21 @@ class GUI:
     
     def createWidgets(self):
         self.txt_area = Text(self.canva, border=1)
-        self.txt_field = Entry(self.canva, width=65, border=1, bg='white')
+        self.txt_field = Entry(self.canva, width=50, border=1, bg='white')
         self.send_button = Button(self.canva, text='Send', padx=40, command=self.send)
         self.update_button = Button(self.canva, text='Update', padx=40, command=self.update)
+        self.clear_button = Button(self.canva, text='Clear', padx=40, command=self.clear_chat)
 
         self.window.bind('<Return>', self.send)
         self.window.bind('<Shift_R>', self.update)
         self.txt_area.bind('<Configure>', self.reset_tabstop)
         self.txt_area.config(background='#c8a2c8')
 
-        self.txt_area.grid(column=0, row=0, columnspan=4)
+        self.txt_area.grid(column=0, row=0, columnspan=5)
         self.txt_field.grid(column=0, row=1, columnspan=2)
         self.send_button.grid(column=2, row=1)
         self.update_button.grid(column=3, row=1)
+        self.clear_button.grid(column=4, row=1)
 
     def connect(self):
         try:
@@ -78,6 +80,9 @@ class GUI:
                 self.txt_area.insert(END, msg)
         except TimeoutError:
             print("Todas mensagens foram carregadas")
+
+    def clear_chat(self, event=None):
+        self.txt_area.delete(1.0, END)
 
     def start(self):
         self.window.mainloop()
