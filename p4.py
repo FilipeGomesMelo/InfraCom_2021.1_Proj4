@@ -2,24 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 import os
 from datetime import datetime
-import threading
 import socket
-
-"""Nota: O sistema de mandar e receber arquivos ainda não funciona corregamente, eu não consegui uma forma
-de diferenciar mensagens de controle e mensagens de usuário direito, então mandar arquivos só funciona se a outra pessoa
-tiver feito um update logo antes (ou o arquivo for a primeira mensagem enviada)
-
-Algo do tipo:
-A envia mensagem
-A envia arquivo
-B faz Update
-
-Não funciona pq o sinal de controle para B começar o download do arquivo acaba se juntando a mensagem
-
-Fora isso, parece estar funcionando corretamente, mas não tem aviso visual dentro da tela ainda
-
-Also, eu tentei usar threads para fazer o download de imagens em outra thread para não travar o app,
-não sei se isso está funcionando corretamente"""
 
 class GUI:
     def __init__(self, width, height, name, target) -> None:
@@ -87,17 +70,18 @@ class GUI:
         msg = self.txt_field.get()
         if msg.replace(' ', '') == '':
             return
-        msg = msg.replace("\\n","\n")
-        msg = f"\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
+        msg = msg.replace("\\n","\n").replace('#', "")
+        msg = f"#\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
         msg = msg.replace('\n', '\n\t')
-        self.txt_area.insert(END, msg)
+        self.txt_area.insert(END, msg[1:])
         self.txt_field.delete(0, END)
 
     def reset_tabstop(self, event):
         event.widget.configure(tabs=(event.width-8, "right"))
 
     def update(self, event=None):
+        aux = []
         try:
             while True:
                 self.connector.settimeout(0.001)
@@ -105,13 +89,17 @@ class GUI:
                 if not msg:
                     return
                 msg = msg.decode('utf-8')
+                aux.append(msg)
+                
+        except TimeoutError:
+            mensagens = ''.join(aux).split('#')[1:]
+            for msg in mensagens:
+                print('>>'+msg)
                 if msg[0] == "!":
-                    t = threading.Thread(target=lambda: self.recv_file(msg))
-                    t.start()
+                        self.recv_file(msg)
                 else:
                     msg = msg.replace("\\n","\n")
                     self.txt_area.insert(END, msg)
-        except TimeoutError:
             print("Todas mensagens foram carregadas")
 
     def clear_chat(self, event=None):
@@ -127,7 +115,7 @@ class GUI:
         size_bytes = os.path.getsize(file_path)
         print(size_bytes)
         name = file_path.split('/')[-1].replace(';','')
-        header = '!'+name+';'+str(size_bytes)
+        header = '#!'+name+';'+str(size_bytes)
         print(header)
         self.connector.sendall(bytes(header, 'utf-8'))
 
