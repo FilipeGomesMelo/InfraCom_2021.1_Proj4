@@ -106,7 +106,7 @@ class GUI:
                     return
                 msg = msg.decode('utf-8')
                 if msg[0] == "!":
-                    t = threading.Thread(target=self.recv_file(msg))
+                    t = threading.Thread(target=lambda: self.recv_file(msg))
                     t.start()
                 else:
                     msg = msg.replace("\\n","\n")
