@@ -93,8 +93,7 @@ class GUI:
                 if not msg:
                     return
                 msg = msg.decode('utf-8')
-                aux.append(msg)
-                
+                aux.append(msg) 
         except TimeoutError:
             mensagens = ''.join(aux).split(self.separation_character)[1:]
             for msg in mensagens:
@@ -117,7 +116,6 @@ class GUI:
         t = threading.Thread(target = lambda: self.send_file(file_path))
         t.start()
             
-    
     def send_file(self, file_path):
         self.send_lock.acquire()
         size_bytes = os.path.getsize(file_path)
