@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+import threading
 import os
 from datetime import datetime
 import socket
@@ -7,6 +8,9 @@ import socket
 class GUI:
     def __init__(self, width, height, name, target) -> None:
         self.name = name
+        self.separation_character = "$#"
+        self.send_lock = threading.Lock()
+        self.recv_lock = threading.Lock()
         self.window = Tk()
         self.window.title("waiting...")
 
@@ -70,11 +74,11 @@ class GUI:
         msg = self.txt_field.get()
         if msg.replace(' ', '') == '':
             return
-        msg = msg.replace("\\n","\n").replace('#', "")
-        msg = f"#\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
+        msg = msg.replace("\\n","\n").replace(self.separation_character, "")
+        msg = f"{self.separation_character}\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
         msg = msg.replace('\n', '\n\t')
-        self.txt_area.insert(END, msg[1:])
+        self.txt_area.insert(END, msg[len(self.separation_character):])
         self.txt_field.delete(0, END)
 
     def reset_tabstop(self, event):
@@ -92,11 +96,12 @@ class GUI:
                 aux.append(msg)
                 
         except TimeoutError:
-            mensagens = ''.join(aux).split('#')[1:]
+            mensagens = ''.join(aux).split(self.separation_character)[1:]
             for msg in mensagens:
                 print('>>'+msg)
                 if msg[0] == "!":
-                        self.recv_file(msg)
+                    t = threading.Thread(target = lambda: self.recv_file(msg))
+                    t.start()
                 else:
                     msg = msg.replace("\\n","\n")
                     self.txt_area.insert(END, msg)
@@ -109,13 +114,16 @@ class GUI:
         file_path = filedialog.askopenfilename()
         if file_path == '':
             return
-        self.send_file(file_path)
+        t = threading.Thread(target = lambda: self.send_file(file_path))
+        t.start()
+            
     
     def send_file(self, file_path):
+        self.send_lock.acquire()
         size_bytes = os.path.getsize(file_path)
         print(size_bytes)
         name = file_path.split('/')[-1].replace(';','')
-        header = '#!'+name+';'+str(size_bytes)
+        header = self.separation_character+'!'+name+';'+str(size_bytes)
         print(header)
         self.connector.sendall(bytes(header, 'utf-8'))
 
@@ -125,8 +133,11 @@ class GUI:
             self.connector_f.sendall(l)
             l = file.read(1024)
         file.close()
+        print(f"fineshed sending {name}")
+        self.send_lock.release()
 
     def recv_file(self, header):
+        self.recv_lock.acquire()
         name, size_bytes = header[1:].split(';')
         print(f"starting dowload of {name}")
         size_bytes = int(size_bytes)
@@ -140,6 +151,7 @@ class GUI:
         file.write(l)
         print(f"File {name} downloaded")
         file.close()
+        self.recv_lock.release()
 
     def start(self):
         self.window.mainloop()
