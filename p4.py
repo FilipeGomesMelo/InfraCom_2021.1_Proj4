@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+import tkinter.font as font
 import threading
 import os
 from datetime import datetime
@@ -15,7 +16,7 @@ class GUI:
         self.window.title("waiting...")
 
         self.canva = Canvas(self.window, width=width, height=height)
-        self.canva.grid(columnspan=5)
+        self.canva.grid(columnspan=6)
         
         self.target_ip = target
 
@@ -28,23 +29,30 @@ class GUI:
         self.connect()
     
     def createWidgets(self):
+        fonte = font.Font(family='Century Gothic', size=8, weight='bold')
+        anexo = PhotoImage(file=r"anexo2.png")
+        miniatura_anexo = anexo.subsample(52)
         self.txt_area = Text(self.canva, border=1)
-        self.txt_field = Entry(self.canva, width=50, border=1, bg='white')
-        self.send_button = Button(self.canva, text='Send', padx=40, command=self.send)
-        self.update_button = Button(self.canva, text='Update', padx=40, command=self.update)
-        self.clear_button = Button(self.canva, text='Clear', padx=40, command=self.clear_chat)
+        self.txt_field = Entry(self.canva, width=50, border=1, bg='#FFF275')
+        self.send_button = Button(self.canva, text='Send', padx=30, command=self.send, bg='#0077B6', fg='white', font=fonte)
+        self.update_button = Button(self.canva, text='Update', padx=30, command=self.update, bg='#0077B6', fg='white', font=fonte)
+        self.clear_button = Button(self.canva, text='Clear', padx=30, command=self.clear_chat, bg='#0077B6', fg='white', font=fonte)
+        self.upload_button = Button(self.canva, text='Upload',padx=20, image=miniatura_anexo, compound=RIGHT, command=self.get_file, bg='#0077B6', fg='white', font=fonte)
+        self.upload_button.miniatura_anexo = miniatura_anexo
+        
 
         self.window.bind('<Return>', self.send)
         # self.window.bind('<Shift_R>', self.update)
         self.txt_area.bind('<Configure>', self.reset_tabstop)
         self.window.bind('<Shift_R>', self.get_file)
-        self.txt_area.config(background='#c8a2c8')
+        self.txt_area.config(background='#7CC8CB')
 
-        self.txt_area.grid(column=0, row=0, columnspan=5)
+        self.txt_area.grid(column=0, row=0, columnspan=6)
         self.txt_field.grid(column=0, row=1, columnspan=2)
         self.send_button.grid(column=2, row=1)
         self.update_button.grid(column=3, row=1)
-        self.clear_button.grid(column=4, row=1)
+        self.clear_button.grid(column=5, row=1)
+        self.upload_button.grid(column=4, row=1)
 
     def connect(self):
         try:
