@@ -111,8 +111,7 @@ class GUI:
             for msg in mensagens:
                 print('>>'+msg)
                 if msg[0] == "!":
-                    t = threading.Thread(target = lambda: self.recv_file(msg))
-                    t.start()
+                    self.recv_file(msg)
                 else:
                     msg = msg.replace("\\n","\n")
                     self.txt_area.insert(END, msg)
@@ -126,7 +125,6 @@ class GUI:
         if file_path == '':
             return
         try:
-            self.miniature_pics
             pic = Image.open(file_path)
             miniature_pic = pic.resize((250, (250*pic.height)//pic.width), Image.ANTIALIAS)
             my_img = ImageTk.PhotoImage(miniature_pic)
@@ -144,7 +142,8 @@ class GUI:
         size_bytes = os.path.getsize(file_path)
         print(size_bytes)
         name = file_path.split('/')[-1].replace(';','')
-        header = self.separation_character+'!'+name+';'+str(size_bytes)
+        header = (self.separation_character+'!'+name+';'+str(size_bytes)+';'+
+                  self.name+';'+datetime.now().strftime('%d/%m/%Y, %H:%M:%S'))
         print(header)
         self.connector.sendall(bytes(header, 'utf-8'))
 
@@ -159,8 +158,7 @@ class GUI:
         
 
     def recv_file(self, header):
-        self.recv_lock.acquire()
-        name, size_bytes = header[1:].split(';')
+        name, size_bytes, sender, time = header[1:].split(';')
         print(f"starting dowload of {name}")
         size_bytes = int(size_bytes)
         file = open(name, 'wb')
@@ -172,8 +170,18 @@ class GUI:
                 size_bytes -= 1024
         file.write(l)
         print(f"File {name} downloaded")
+        file_path = file.name
         file.close()
-        self.recv_lock.release()
+        try:
+            pic = Image.open(file_path)
+            miniature_pic = pic.resize((250, (250*pic.height)//pic.width), Image.ANTIALIAS)
+            my_img = ImageTk.PhotoImage(miniature_pic)
+            self.miniature_pics.append(my_img)
+            self.txt_area.insert(END, f'\n{sender}:\n')
+            self.txt_area.image_create(END, image=self.miniature_pics[-1])
+            self.txt_area.insert(END, f"\n{time}\n")
+        except:
+            pass
 
     def start(self):
         self.window.mainloop()
