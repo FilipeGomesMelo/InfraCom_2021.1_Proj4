@@ -36,7 +36,7 @@ class GUI:
         fonte = font.Font(family='Century Gothic', size=8, weight='bold')
         anexo = PhotoImage(file=r"anexo2.png")
         miniatura_anexo = anexo.subsample(52)
-        self.txt_area = Text(self.canva, border=1)
+        self.txt_area = Text(self.canva, border=1, width=90, height=35)
         self.txt_field = Entry(self.canva, width=50, border=1, bg='#FFF275')
         self.send_button = Button(self.canva, text='Send', padx=30, command=self.send, bg='#0077B6', fg='white', font=fonte)
         self.update_button = Button(self.canva, text='Update', padx=30, command=self.update, bg='#0077B6', fg='white', font=fonte)
@@ -126,7 +126,7 @@ class GUI:
             return
         try:
             pic = Image.open(file_path)
-            miniature_pic = pic.resize((250, (250*pic.height)//pic.width), Image.ANTIALIAS)
+            miniature_pic = pic.resize((325, (325*pic.height)//pic.width), Image.ANTIALIAS)
             my_img = ImageTk.PhotoImage(miniature_pic)
             self.miniature_pics.append(my_img)
             self.txt_area.insert(END, f'\n\t{self.name}:\n\t')
@@ -174,7 +174,7 @@ class GUI:
         file.close()
         try:
             pic = Image.open(file_path)
-            miniature_pic = pic.resize((250, (250*pic.height)//pic.width), Image.ANTIALIAS)
+            miniature_pic = pic.resize((325, (325*pic.height)//pic.width), Image.ANTIALIAS)
             my_img = ImageTk.PhotoImage(miniature_pic)
             self.miniature_pics.append(my_img)
             self.txt_area.insert(END, f'\n{sender}:\n')
