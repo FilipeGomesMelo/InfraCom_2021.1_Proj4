@@ -128,12 +128,12 @@ class GUI:
         try:
             self.miniature_pics
             pic = Image.open(file_path)
-            miniature_pic = pic.resize((150, (150*pic.height)//pic.width), Image.ANTIALIAS)
+            miniature_pic = pic.resize((250, (250*pic.height)//pic.width), Image.ANTIALIAS)
             my_img = ImageTk.PhotoImage(miniature_pic)
             self.miniature_pics.append(my_img)
-            self.txt_area.insert(END,'\n\t')
+            self.txt_area.insert(END, f'\n\t{self.name}:\n\t')
             self.txt_area.image_create(END, image=self.miniature_pics[-1])
-            self.txt_area.insert(END,'\n')
+            self.txt_area.insert(END, f"\n\t{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n")
         except:
             pass
         t = threading.Thread(target = lambda: self.send_file(file_path))
