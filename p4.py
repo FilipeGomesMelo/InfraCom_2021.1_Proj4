@@ -14,6 +14,7 @@ class GUI:
         self.recv_lock = threading.Lock()
         self.window = Tk()
         self.window.title("waiting...")
+        self.pics = []
 
         self.canva = Canvas(self.window, width=width, height=height)
         self.canva.grid(columnspan=6)
@@ -102,7 +103,7 @@ class GUI:
                     return
                 msg = msg.decode('utf-8')
                 aux.append(msg) 
-        except TimeoutError:
+        except:
             mensagens = ''.join(aux).split(self.separation_character)[1:]
             for msg in mensagens:
                 print('>>'+msg)
@@ -121,6 +122,12 @@ class GUI:
         file_path = filedialog.askopenfilename()
         if file_path == '':
             return
+        global pic
+        global picaux
+        picaux = PhotoImage(file=file_path)
+        pic = picaux.subsample(10)
+        self.pics.append(pic)
+        self.txt_area.window_create(END, window=Label(self.txt_area,image=self.pics[-1]))
         t = threading.Thread(target = lambda: self.send_file(file_path))
         t.start()
             
@@ -141,6 +148,7 @@ class GUI:
         file.close()
         print(f"fineshed sending {name}")
         self.send_lock.release()
+        
 
     def recv_file(self, header):
         self.recv_lock.acquire()
