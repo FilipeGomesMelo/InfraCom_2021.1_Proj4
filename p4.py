@@ -17,6 +17,7 @@ class GUI:
         self.recv_lock = threading.Lock()
         self.window = Tk()
         self.window.title("waiting...")
+        self.pics = []
 
         self.canva = Canvas(self.window, width=width, height=height)
         self.canva.grid(columnspan=6)
@@ -155,6 +156,7 @@ class GUI:
         file.close()
         print(f"fineshed sending {name}")
         self.send_lock.release()
+        
 
     def recv_file(self, header):
         self.recv_lock.acquire()
