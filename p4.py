@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+from PIL import Image, ImageTk
 import tkinter.font as font
 import threading
 import os
@@ -8,6 +9,8 @@ import socket
 
 class GUI:
     def __init__(self, width, height, name, target) -> None:
+        self.miniature_pics = []
+
         self.name = name
         self.separation_character = "$#"
         self.send_lock = threading.Lock()
@@ -102,7 +105,7 @@ class GUI:
                     return
                 msg = msg.decode('utf-8')
                 aux.append(msg) 
-        except TimeoutError:
+        except:
             mensagens = ''.join(aux).split(self.separation_character)[1:]
             for msg in mensagens:
                 print('>>'+msg)
@@ -121,6 +124,17 @@ class GUI:
         file_path = filedialog.askopenfilename()
         if file_path == '':
             return
+        try:
+            self.miniature_pics
+            pic = Image.open(file_path)
+            miniature_pic = pic.resize((150, (150*pic.height)//pic.width), Image.ANTIALIAS)
+            my_img = ImageTk.PhotoImage(miniature_pic)
+            self.miniature_pics.append(my_img)
+            self.txt_area.insert(END,'\n\t')
+            self.txt_area.image_create(END, image=self.miniature_pics[-1])
+            self.txt_area.insert(END,'\n')
+        except:
+            pass
         t = threading.Thread(target = lambda: self.send_file(file_path))
         t.start()
             
