@@ -6,6 +6,7 @@ import threading
 import os
 from datetime import datetime
 import socket
+from pygame import mixer
 
 class GUI:
     def __init__(self, width, height, name, target) -> None:
@@ -21,10 +22,13 @@ class GUI:
 
         self.canva = Canvas(self.window, width=width, height=height)
         self.canva.grid(columnspan=6)
+
+        self.audio = None
         
         self.target_ip = target
 
         self.createWidgets()
+        mixer.init()
 
         self.status = ''
         self.conn = None
@@ -171,7 +175,16 @@ class GUI:
         file.write(l)
         print(f"File {name} downloaded")
         file_path = file.name
+        file_formmat = file_path[-3:]
         file.close()
+
+        if file_formmat in ["wav","mp3","ogg"]:
+            if self.audio is not None:
+                self.audio.stop()
+    
+            self.audio = mixer.Sound(file_path)                
+            self.audio.play()
+
         try:
             pic = Image.open(file_path)
             miniature_pic = pic.resize((325, (325*pic.height)//pic.width), Image.ANTIALIAS)
