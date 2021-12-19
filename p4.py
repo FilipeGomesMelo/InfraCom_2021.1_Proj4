@@ -31,6 +31,8 @@ class GUI:
         self.audio_channel = mixer.Channel(0)
         self.playing_audio = False
 
+        self.media_dict = dict()
+
         self.status = ''
         self.conn = None
         self.addr = None
@@ -93,6 +95,13 @@ class GUI:
         msg = self.txt_field.get()
         if msg.replace(' ', '') == '':
             return
+        
+        if msg[:5] == "!play":
+            # Play the sound in the file. Ex: !play me.wav
+            file = self.media_dict[msg[6:]]
+            self.play_audio(file)
+            return
+
         msg = msg.replace("\\n","\n").replace(self.separation_character, "")
         msg = f"{self.separation_character}\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
@@ -127,13 +136,18 @@ class GUI:
     def clear_chat(self, event=None):
         self.txt_area.delete(1.0, END)
 
-    def pause_audio(self, event=None):
-        self._pause_audio()
+    def play_audio(self,audio):
+        # If there is an audio playing, stop it
+        try:
+            self.audio_channel.stop()
     
-    def stop_audio(self, event=None):
-        self._stop_audio()
+            # Play the audio
+            self.audio_channel.play(audio)
+            self.playing_audio = True
+        except KeyError:
+            print("Audio nao encontado")
 
-    def _pause_audio(self):
+    def pause_audio(self, event=None):
         # If there is not playing, return
         if not self.audio_channel.get_busy():
             return
@@ -145,7 +159,7 @@ class GUI:
         
         self.playing_audio = not self.playing_audio
 
-    def _stop_audio(self):
+    def stop_audio(self, event=None):
         # If there is not playing, return
         if not self.audio_channel.get_busy():
             return
@@ -203,18 +217,17 @@ class GUI:
         file.write(l)
         print(f"File {name} downloaded")
         file_path = file.name
-        file_formmat = file_path[-3:]
+        #file_formmat = file_path[-3:]
         file.close()
 
-        if file_formmat in ["wav","mp3","ogg"]:
-            # If there is an audio playing, stop it
-            self.audio_channel.stop()
-    
-            # Play the audio
+        type_index = file_path.rindex(".")
+        file_format = file_path[type_index+1:]
+
+        if file_format in ["wav","mp3","ogg"]:
             audio = mixer.Sound(file_path)                
-            self.audio_channel.play(audio)
-            self.playing_audio = True
-        elif file_formmat in ["mp4"]:
+            self.media_dict[file_path] = audio
+
+        elif file_format in ["mp4"]:
             os.startfile(file_path)
 
         try:
