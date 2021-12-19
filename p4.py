@@ -6,6 +6,7 @@ import threading
 import os
 from datetime import datetime
 import socket
+import time
 from pygame import mixer
 
 class GUI:
@@ -26,6 +27,9 @@ class GUI:
         self.target_ip = target
 
         self.createWidgets()
+        t = threading.Thread(target = self.check_updates,args=())
+        t.setDaemon(True)
+        t.start()
 
         mixer.init()
         self.audio_channel = mixer.Channel(0)
@@ -101,7 +105,7 @@ class GUI:
             file = self.media_dict[msg[6:]]
             self.play_audio(file)
             return
-
+        
         msg = msg.replace("\\n","\n").replace(self.separation_character, "")
         msg = f"{self.separation_character}\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
@@ -112,6 +116,12 @@ class GUI:
     def reset_tabstop(self, event):
         event.widget.configure(tabs=(event.width-8, "right"))
 
+    # thread pra checar que chama a checagem de novas mensagens em um timer
+    def check_updates(self):
+        while True:
+            time.sleep(0.5)
+            self.update()
+            
     def update(self, event=None):
         aux = []
         try:
@@ -131,7 +141,7 @@ class GUI:
                 else:
                     msg = msg.replace("\\n","\n")
                     self.txt_area.insert(END, msg)
-            print("Todas mensagens foram carregadas")
+            #print("Todas mensagens foram carregadas")
 
     def clear_chat(self, event=None):
         self.txt_area.delete(1.0, END)
