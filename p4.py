@@ -22,13 +22,14 @@ class GUI:
 
         self.canva = Canvas(self.window, width=width, height=height)
         self.canva.grid(columnspan=6)
-
-        self.audio = None
         
         self.target_ip = target
 
         self.createWidgets()
+
         mixer.init()
+        self.audio_channel = mixer.Channel(0)
+        self.playing_audio = False
 
         self.status = ''
         self.conn = None
@@ -53,6 +54,8 @@ class GUI:
         # self.window.bind('<Shift_R>', self.update)
         self.txt_area.bind('<Configure>', self.reset_tabstop)
         self.window.bind('<Shift_R>', self.get_file)
+        self.window.bind('<Alt_L>', self.pause_audio)
+        self.window.bind('<Alt_R>', self.stop_audio)
         self.txt_area.config(background='#7CC8CB')
 
         self.txt_area.grid(column=0, row=0, columnspan=6)
@@ -124,6 +127,25 @@ class GUI:
     def clear_chat(self, event=None):
         self.txt_area.delete(1.0, END)
 
+    def pause_audio(self, event=None):
+        # If there is not playing, return
+        if not self.audio_channel.get_busy():
+            return
+
+        if self.playing_audio: 
+            self.audio_channel.pause()
+        else:
+            self.audio_channel.unpause()
+        
+        self.playing_audio = not self.playing_audio
+
+    def stop_audio(self, event=None):
+        # If there is not playing, return
+        if not self.audio_channel.get_busy():
+            return
+
+        self.audio_channel.stop()
+
     def get_file(self, event=None):
         file_path = filedialog.askopenfilename()
         if file_path == '':
@@ -179,11 +201,13 @@ class GUI:
         file.close()
 
         if file_formmat in ["wav","mp3","ogg"]:
-            if self.audio is not None:
-                self.audio.stop()
+            # If there is an audio playing, stop it
+            self.audio_channel.stop()
     
-            self.audio = mixer.Sound(file_path)                
-            self.audio.play()
+            # Play the audio
+            audio = mixer.Sound(file_path)                
+            self.audio_channel.play(audio)
+            self.playing_audio = True
 
         try:
             pic = Image.open(file_path)
