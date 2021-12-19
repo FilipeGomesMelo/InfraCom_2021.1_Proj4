@@ -93,6 +93,13 @@ class GUI:
             self.connector_f = self.conn_f
         finally:
             self.window.title(self.status)
+
+    def write_log(self, msg):
+        log_name = f"chat_log_{self.name}.txt"
+
+        # Escreve a mensagem no log
+        with open(log_name,"a",encoding="utf-8") as log:
+            log.write(msg)
     
     def send(self, event=None):
         msg = self.txt_field.get()
@@ -126,6 +133,8 @@ class GUI:
         self.txt_area.insert(END, msg[len(self.separation_character):])
         self.txt_field.delete(0, END)
 
+        self.write_log("\n" + msg[4:]) # Remove alguns chars desncessários
+
     def reset_tabstop(self, event):
         event.widget.configure(tabs=(event.width-8, "right"))
 
@@ -153,6 +162,7 @@ class GUI:
                 else:
                     msg = msg.replace("\\n","\n")
                     self.txt_area.insert(END, msg)
+                    self.write_log(msg)
 
     def clear_chat(self, event=None):
         self.txt_area.delete(1.0, END)
