@@ -35,6 +35,7 @@ class GUI:
         self.playing_audio = False
 
         self.media_dict = dict()
+        self.media_path_dict = dict()
 
         self.status = ''
         self.conn = None
@@ -107,7 +108,13 @@ class GUI:
             return
         
         if msg[:5] == "!play":
-            type_index = msg[6:].rindex(".")
+            try:
+                type_index = msg[6:].rindex(".")
+            except ValueError: 
+                print("404 - File Not Found")
+                self.txt_field.delete(0, END)
+                return
+
             file_format = msg[6:][type_index+1:]
             if file_format in ["wav","mp3","ogg"] and msg[6:] in self.media_dict:
                 # Play the sound in the file. Ex: !play me.wav
@@ -119,7 +126,13 @@ class GUI:
                     # Se o arquivo não for um arquivo de áudio, tentamos abrir ele com os, só funciona se estiver no diretório que está rodando
                     # o cliente
                     print(f"Abrindo {msg[6:]}")
-                    os.startfile(os.getcwd()+'\\'+msg[6:])
+
+                    # Se o arquivo tiver sido enviado pelo usuário, o acessa por seu diretório.
+                    # Senão, o acessa pela pasta da aplicação
+                    if msg[6:] in self.media_path_dict:
+                        os.startfile(msg[6:])
+                    else:
+                        os.startfile(os.getcwd()+'\\'+msg[6:])
                 except:
                     # Se não conseguir, printa que arquivo não foi achado
                     print("404 - File Not Found")
@@ -243,6 +256,16 @@ class GUI:
             self.connector_f.sendall(l)
             l = file.read(1024)
         file.close()
+        
+        type_index = file_path.rindex(".")
+        file_format = file_path[type_index+1:]
+
+        if file_format in ["wav","mp3","ogg"]:
+            audio = mixer.Sound(file_path)
+            self.media_dict[name] = audio
+        else:
+            self.media_path_dict[name] = file_path
+
         print(f"Terminamos colocar {file_path.split('/')[-1]} no buffer")
         self.send_lock.release()
         
