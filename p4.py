@@ -54,8 +54,8 @@ class GUI:
         # self.window.bind('<Shift_R>', self.update)
         self.txt_area.bind('<Configure>', self.reset_tabstop)
         self.window.bind('<Shift_R>', self.get_file)
-        self.window.bind('<Alt_L>', self.pause_audio)
-        self.window.bind('<Alt_R>', self.stop_audio)
+        self.window.bind('<F1>', self.pause_audio)
+        self.window.bind('<F2>', self.stop_audio)
         self.txt_area.config(background='#7CC8CB')
 
         self.txt_area.grid(column=0, row=0, columnspan=6)
@@ -128,6 +128,12 @@ class GUI:
         self.txt_area.delete(1.0, END)
 
     def pause_audio(self, event=None):
+        self._pause_audio()
+    
+    def stop_audio(self, event=None):
+        self._stop_audio()
+
+    def _pause_audio(self):
         # If there is not playing, return
         if not self.audio_channel.get_busy():
             return
@@ -139,7 +145,7 @@ class GUI:
         
         self.playing_audio = not self.playing_audio
 
-    def stop_audio(self, event=None):
+    def _stop_audio(self):
         # If there is not playing, return
         if not self.audio_channel.get_busy():
             return
@@ -208,6 +214,8 @@ class GUI:
             audio = mixer.Sound(file_path)                
             self.audio_channel.play(audio)
             self.playing_audio = True
+        elif file_formmat in ["mp4"]:
+            os.startfile(file_path)
 
         try:
             pic = Image.open(file_path)
