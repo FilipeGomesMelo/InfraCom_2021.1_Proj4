@@ -139,6 +139,20 @@ class GUI:
             self.txt_field.delete(0, END)
             return
         
+
+        # msg_mas e o maximo de caracteres por linha ate quebrar para a proxima
+        msg_max = 40
+        if len(msg) > msg_max: # quebra a msg em linhas para melhor formatacao
+            j = 1
+            last_pos = 0
+            while j*msg_max < len(msg):
+                f = (msg[last_pos: min(last_pos + msg_max,len(msg))])[::-1].find(' ')
+                f = last_pos + msg_max - f
+                if(f!= - 1):
+                    msg = msg[:f-1] + "\n" + msg[f:]
+                    last_pos = f
+                j += 1
+
         msg = msg.replace("\\n","\n").replace(self.separation_character, "")
         msg = f"{self.separation_character}\n{self.name}: {msg}\n{datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n"
         self.connector.sendall(bytes(msg, 'utf-8')) 
