@@ -1,0 +1,10 @@
+Para abrir a aplicação, é necessário instalar os módulos pillow, pygame e imageio usando o pip.
+Após isso, é necessário executar duas vezes a aplicação em terminais distintos para simular os clientes.
+Por fim, basta inserir o nome de cada cliente e duas janelas do TKinter devem se abrir.
+
+Imagens são visualizadas automaticamente após seu envio, mas para os demais tipos de arquivo, é necessário
+executar o comando "!play <nome_arquivo>" no campo de inserir mensagens do chat
+Ex: !play minha_musica.mp3
+
+Para Pausar e Retomar um áudio, use F1
+Para Parar um áudio, use F2
