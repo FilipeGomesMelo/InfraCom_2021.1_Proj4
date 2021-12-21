@@ -1,5 +1,5 @@
-Para abrir a aplicação, é necessário instalar os módulos pillow, pygame e imageio usando o pip.
-Após isso, é necessário executar duas vezes a aplicação em terminais distintos para simular os clientes.
+Para abrir a aplicação, é necessário instalar os módulos pillow, pygame e imageio usando o pip. Também é necessário que o arquivo VideoPlayer.py esteja no mesmo diretório que o arquivo base (p4.py).
+Após isso, é necessário executar duas vezes o arquivo p4.py em terminais distintos para simular os clientes.
 Por fim, basta inserir o nome de cada cliente e duas janelas do TKinter devem se abrir.
 
 Imagens são visualizadas automaticamente após seu envio, mas para os demais tipos de arquivo, é necessário
