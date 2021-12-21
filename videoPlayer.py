@@ -1,9 +1,10 @@
 import tkinter as tk, threading
+from tkinter import filedialog
 import time
 import imageio
 from PIL import Image, ImageTk
 
-def play_video(path="t.mp4", fps=60):
+def play_video(path, fps=60):
     video_name = path #This is your video file path
     video = imageio.get_reader(video_name)
 
@@ -16,6 +17,7 @@ def play_video(path="t.mp4", fps=60):
             time.sleep(1/fps)
 
     root = tk.Tk()
+    root.title("Video Player")
     my_label = tk.Label(root)
     my_label.pack()
     thread = threading.Thread(target=stream, args=(my_label,video,fps), daemon=1)
@@ -24,4 +26,4 @@ def play_video(path="t.mp4", fps=60):
 
 
 if __name__ == '__main__':
-    play_video()
+    play_video(filedialog.askopenfilename())
