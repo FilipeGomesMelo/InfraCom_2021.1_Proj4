@@ -79,11 +79,11 @@ class GUI:
             self.s.connect((self.target_ip, 28886))
             self.s_f = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s_f.connect((self.target_ip, 28887))
-            self.status = f'{self.name} - client'
+            self.status = f'Zip Zop - {self.name}'
             self.connector = self.s
             self.connector_f = self.s_f
         except ConnectionRefusedError:
-            self.status = f'{self.name} - Server'
+            self.status = f'Zip Zop - {self.name}'
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.s.bind(('localhost', 28886))
             self.s.listen(1)
