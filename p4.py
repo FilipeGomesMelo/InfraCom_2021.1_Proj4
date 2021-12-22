@@ -1,3 +1,12 @@
+#- Amadeo -> atcn
+#- Pedro Victor -> pvlb
+#- Bruna Alves -> baws
+#- Filipe Melo -> fgm3
+#- Weslley da Hora -> wbh
+#- Julio Vinicius -> jvgs
+#- Carlos Pereira -> crcp
+#- Frederico Bresani -> fbs4 
+
 from tkinter import *
 from tkinter import filedialog
 from PIL import Image, ImageTk

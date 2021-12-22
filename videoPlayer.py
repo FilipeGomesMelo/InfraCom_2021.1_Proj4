@@ -1,3 +1,12 @@
+#- Amadeo -> atcn
+#- Pedro Victor -> pvlb
+#- Bruna Alves -> baws
+#- Filipe Melo -> fgm3
+#- Weslley da Hora -> wbh
+#- Julio Vinicius -> jvgs
+#- Carlos Pereira -> crcp
+#- Frederico Bresani -> fbs4 
+
 import tkinter as tk, threading
 from tkinter import filedialog
 import time
